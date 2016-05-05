@@ -1,25 +1,32 @@
 from app import app
+from datetime import datetime
+from bson.objectid import ObjectId
 from flask import request
 from pyzillow.pyzillow import ZillowWrapper, GetDeepSearchResults
 from pymongo import MongoClient
-from datetime import datetime
+
 
 @app.route('/')
 @app.route('/index')
 def index():
     return "Hello, World!"
 
+@app.route('/zillow_data', methods=('GET', 'POST'))
+def get_data():
+    if request.method == 'POST':
+        if request.values.get('r_id'):
+            r_id = request.values.get('r_id')
+            client = MongoClient()
+            db = client.zillow
+            res = db.find_one({"_id": r_id})
+            return 'working', r_id
+
+    return "please post with valid 'r_id"
+
+
 @app.route('/zillow', methods=('GET', 'POST'))
 def zillow():
-    client = MongoClient()
-    db = client.zillow
-    coll = db.zillow_set
     if request.method == 'POST':
-        #print 'request:',request
-        #print 'headers:', request.headers
-        #print 'values:',request.values
-        #print 'args:',request.args
-        #print 'form:',request.form
         if request.values.get('zwsid'):
             zwsid = request.values.get('zwsid')
         else:
@@ -34,13 +41,13 @@ def zillow():
             return "missing zipcode"
         zillow_data = ZillowWrapper(zwsid)
         deep_search_response = zillow_data.get_deep_search_results(address, zipcode)
-        #print "here"
         result = GetDeepSearchResults(deep_search_response)
-        #print result
-        #print 'z:',result.zestimate_amount
+
+        client = MongoClient()
+        db = client.zillow
         result = db.zillow.insert_one(
             {
-                "request_time":datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+                "request_time":datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'),
                 "zillow_responce": {
                     "zillow_id": result.zillow_id,
                     "home_type": result.home_type,
@@ -73,8 +80,5 @@ def zillow():
                 },
             }
         )
-        print result
-        return "Zillow pOSTER for life!!{} {} {}".format(zwsid,address,zipcode)
-
-    else:
-        return "Zillow getter"
+        return str(result.inserted_id)
+    return "please post with valid 'zwsid' 'address' 'zipcode' "
