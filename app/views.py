@@ -35,10 +35,10 @@ def get_data():
             except InvalidId:
                 pass
 
-    return "please post with valid 'r_id'"
+    return VALID_R_ID_ERR
 
 
-@app.route('/')
+@app.route('/', methods=('GET', 'POST'))
 @app.route('/zillow', methods=('GET', 'POST'))
 def zillow():
     """
