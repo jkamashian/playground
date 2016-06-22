@@ -42,6 +42,16 @@ class TestApp(TestCase):
         inserted into mongoDB successfully
         :param clean: Boolean to determine weather to clean up after it self
         :return: The mongo object id for the data inserted
+
+        success fixture:
+            fixture = dict(zwsid='X1-ZWz1f5677kiadn_6bk45',
+                           address='16212 Haynes',
+                           zipcode='91406')
+        fail fixture:
+            fixture = dict(zwsid='X1-ZWz1f5677kiadn_6bk45',
+                           address='640 Clearwater Ln',
+                           zipcode='83127')
+
         """
         url = base_url + "/zillow"
         fixture = dict(zwsid='X1-ZWz1f5677kiadn_6bk45',
@@ -53,12 +63,12 @@ class TestApp(TestCase):
             raise self.failureException("Test Failed because the app is not "
                                         "running, please run 'python run.py'"
                                         " from project root.")
+        print(response.text)
         self.assertTrue(self.validate_id(response.text), "Failed to find "
                                                          "response ID in "
                                                          "MongoDB")
         if clean is True:
             self.collection.remove({"_id": ObjectId(response.text)})
-        print(response.text)
         return response.text
 
     def test_views_get_data(self):
