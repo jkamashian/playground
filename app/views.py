@@ -5,6 +5,8 @@ from bson.errors import InvalidId
 from flask import request
 from pyzillow.pyzillow import ZillowWrapper, GetDeepSearchResults, ZillowError
 from pymongo import MongoClient
+import logging
+log = logging.getLogger('app')
 
 
 VALID_ZAZ_ERR = "please post with valid 'zwsid' 'address' 'zipcode' "
@@ -20,7 +22,7 @@ def get_data():
     if a user enters an invalid r_id or dosen't post
     return VALID_R_ID_ERR error message
     """
-    if request.method == 'POST':
+    if request.method in ['POST', 'GET']:
         if request.values.get('r_id'):
             try:
                 r_id = request.values.get('r_id')
@@ -29,7 +31,7 @@ def get_data():
                 coll = db.zillow
                 res = coll.find_one({"_id": ObjectId(r_id)})
 
-                print 'r_id:', r_id
+                log.debug('r_id: %s' % r_id)
                 if res:
                     return res['zillow_responce'].get('zestimate_amount')
             except InvalidId:
@@ -48,24 +50,28 @@ def zillow():
     returns VALID_ADDRESS_ERR with missing address
     returns VALID_ZIPCODE_ERR with missing zipcode
     """
-    if request.method == 'POST':
+    if request.method in ['POST', 'GET']:
         if request.values.get('zwsid'):
             zwsid = request.values.get('zwsid')
+            log.debug(zwsid)
         else:
             return VALID_ZWSID_ERR
         if request.values.get('address'):
             address = request.values.get('address')
+            log.debug(address)
         else:
             return VALID_ADDRESS_ERR
         if request.values.get('zipcode'):
             zipcode = request.values.get('zipcode')
+            log.debug(request)
         else:
             return VALID_ZIPCODE_ERR
         try:
             zillow_data = ZillowWrapper(zwsid)
             deep_search_response = zillow_data.get_deep_search_results(address, zipcode)
             result = GetDeepSearchResults(deep_search_response)
-        except ZillowError:
+        except ZillowError as e:
+            log.error(e)
             return VALID_ZAZ_ERR
 
         client = MongoClient()
