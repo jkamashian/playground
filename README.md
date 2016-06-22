@@ -16,10 +16,10 @@ please note this was built in a Unix environment and has not yet been tested for
 
 
 #Recommendations
-I recamend installing "Virtualenv" (https://virtualenv.pypa.io/en/latest/) its a nice way to keep python libs feom overwritting/conflicting with one another on seprate projects
-Setup a python virtual environment for playground repo on Unix
-Please note that the following steps can be used to set up a pyenv for any repo that requires one.
-This example will focus on the zillow playground repo.
+- I recommend installing "Virtualenv" (https://virtualenv.pypa.io/en/latest/) its a nice way to keep python libs feom         * overwritting/conflicting with one another on seprate projects
+    * Setup a python virtual environment for playground repo on Unix
+    * Please note that the following steps can be used to set up a pyenv for any repo that requires one.
+    * This example will focus on the zillow playground repo.
 1. Go to playground directory and install pyenv:
     * cd /opt/qa-test/playground
     * brew install pyenv
