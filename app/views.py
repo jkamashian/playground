@@ -33,7 +33,8 @@ def get_data():
 
                 log.debug('r_id: %s' % r_id)
                 if res:
-                    return res['zillow_responce'].get('zestimate_amount')
+                    z_est = res['zillow_responce'].get('zestimate_amount')
+                    return "$" + '{:20,}'.format(int(z_est)).strip()
             except InvalidId:
                 pass
 
@@ -76,33 +77,33 @@ def zillow():
 
         client = MongoClient()
         db = client.zillow
-        result = db.zillow.insert_one(
+        mongo_result = db.zillow.insert_one(
             {
                 "request_time":datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'),
                 "zillow_responce": {
-                    "zillow_id": result.zillow_id,
-                    "home_type": result.home_type,
-                    "home_detail_link": result.home_detail_link,
-                    "graph_data_link": result.graph_data_link,
-                    "map_this_home_link": result.map_this_home_link,
-                    "latitude": result.latitude,
-                    "longitude": result.longitude,
-                    "tax_year": result.tax_year,
-                    "tax_value": result.tax_value,
-                    "year_built": result.year_built,
-                    "property_size": result.property_size,
-                    "home_size": result.home_size,
-                    "bathrooms": result.bathrooms,
-                    "bedrooms": result.bedrooms,
-                    "last_sold_date": result.last_sold_date,
-                    "last_sold_price_currency": result.last_sold_price_currency,
-                    "last_sold_price": result.last_sold_price,
-                    "zestimate_amount": result.zestimate_amount,
-                    "zestimate_last_updated": result.zestimate_last_updated,
-                    "zestimate_value_change": result.zestimate_value_change,
-                    "zestimate_valuation_range_high": result.zestimate_valuation_range_high,
-                    "zestimate_valuationRange_low": result.zestimate_valuationRange_low,
-                    "zestimate_percentile": result.zestimate_percentile
+                    "zillow_id": getattr(result, "zillow_id"),
+                    "home_type": getattr(result, "home_type"),
+                    "home_detail_link": getattr(result, "home_detail_link"),
+                    "graph_data_link": getattr(result, "graph_data_link"),
+                    "map_this_home_link": getattr(result, "map_this_home_link"),
+                    "latitude": getattr(result, "latitude"),
+                    "longitude": getattr(result, "longitude"),
+                    "tax_year": getattr(result, "tax_year"),
+                    "tax_value": getattr(result, "tax_value"),
+                    "year_built": getattr(result, "year_built"),
+                    "property_size": getattr(result, "property_size"),
+                    "home_size": getattr(result, "home_size"),
+                    "bathrooms": getattr(result, "bathrooms"),
+                    "bedrooms": getattr(result, "bedrooms"),
+                    "last_sold_date": getattr(result, "last_sold_date"),
+                    "last_sold_price_currency": getattr(result, "last_sold_price_currency"),
+                    "last_sold_price": getattr(result, "last_sold_price"),
+                    "zestimate_amount": getattr(result, "zestimate_amount"),
+                    "zestimate_last_updated": getattr(result, "zestimate_last_updated"),
+                    "zestimate_value_change": getattr(result, "zestimate_value_change"),
+                    "zestimate_valuation_range_high": getattr(result, "zestimate_valuation_range_high"),
+                    "zestimate_valuationRange_low": getattr(result, "zestimate_valuationRange_low"),
+                    "zestimate_percentile": getattr(result, "zestimate_percentile")
                 },
                 "request_information": {
                     'zwsid':zwsid,
@@ -111,5 +112,5 @@ def zillow():
                 },
             }
         )
-        return str(result.inserted_id)
+        return str(mongo_result.inserted_id)
     return VALID_ZAZ_ERR
